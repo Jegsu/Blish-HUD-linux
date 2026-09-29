@@ -1,0 +1,53 @@
+[package]
+name = "blishhud-bridge"
+version = "0.2.0"
+edition = "2024"
+description = "Renders Blish HUD inside Guild Wars 2, loaded as a d3d11.dll proxy."
+license = "Apache-2.0"
+publish = false
+
+[lib]
+# Built as d3d11.dll so it can be dropped next to Gw2-64.exe and loaded by the game itself.
+name = "d3d11"
+crate-type = ["cdylib"]
+
+[dependencies]
+log = "0.4"
+thiserror = "2"
+
+# Everything that touches the game process is Windows-only. Keeping it behind this gate means
+# the pure modules (protocol, config, keybinds, click routing) build and test on any host.
+[target.'cfg(windows)'.dependencies]
+retour = "0.3"
+fern = "0.7"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+[target.'cfg(windows)'.dependencies.windows]
+version = "0.56"
+features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Direct3D",
+    "Win32_Graphics_Direct3D11",
+    "Win32_Graphics_Dxgi",
+    "Win32_Graphics_Dxgi_Common",
+    "Win32_Graphics_Gdi",
+    "Win32_Security",
+    "Win32_System_JobObjects",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Memory",
+    "Win32_System_SystemInformation",
+    "Win32_System_SystemServices",
+    "Win32_System_Threading",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
+]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+# Deliberately "unwind", not "abort": this code runs inside the game, and every entry point
+# (the Present hook, the window procedure, the startup thread) catches panics so that a bug
+# here disables the overlay instead of killing Guild Wars 2.
+panic = "unwind"
