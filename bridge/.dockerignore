@@ -1,0 +1,4 @@
+# The build image copies nothing from its context: the sources are bind-mounted when a build
+# runs (see docker-compose.yml). Excluding everything keeps `docker compose build` from sending
+# target/ and the sources to Docker for nothing.
+*

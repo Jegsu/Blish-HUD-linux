@@ -1,0 +1,23 @@
+services:
+  # The C# Blish HUD assembly.
+  blish:
+    build: .
+    user: "${BUILD_UID:-1000}:${BUILD_GID:-1000}"
+    volumes:
+      - .:/workspace
+      - nuget-cache:/nuget
+
+  # The bridge: the d3d11.dll that draws Blish inside the game and feeds it input.
+  bridge:
+    build: ./bridge
+    user: "${BUILD_UID:-1000}:${BUILD_GID:-1000}"
+    working_dir: /workspace/bridge
+    volumes:
+      - .:/workspace
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+
+volumes:
+  nuget-cache:
+  cargo-registry:
+  cargo-git:
