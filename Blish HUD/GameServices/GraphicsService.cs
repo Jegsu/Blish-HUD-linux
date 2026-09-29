@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Blish_HUD.Controls;
+﻿using Blish_HUD.Controls;
 using Blish_HUD.Entities;
 using Blish_HUD.Graphics;
 using Blish_HUD.Settings;
+using Blish_HUD.Strings.GameServices;
 using Gw2Sharp.Mumble.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
 using Color = Microsoft.Xna.Framework.Color;
 using Matrix = Microsoft.Xna.Framework.Matrix;
 using Point = Microsoft.Xna.Framework.Point;
@@ -420,11 +420,13 @@ namespace Blish_HUD {
             if (_renderTimer.ElapsedMilliseconds > 1) {
                 Logger.Debug($"Render thread stalled for {_renderTimer.ElapsedMilliseconds} ms.");
             }
+            var device = ctx.GraphicsDevice;
 
             ctx.GraphicsDevice.Clear(Color.Transparent);
 
             // Skip rendering all elements when UI is hidden
-            if (GameService.Overlay.InterfaceHidden) return;
+            if (GameService.Overlay.InterfaceHidden)  return;
+            
 
             GameService.Debug.StartTimeFunc("3D objects");
             // Only draw 3D elements if we are in game and map is closed
@@ -453,6 +455,8 @@ namespace Blish_HUD {
                 }
             }
             GameService.Debug.StopTimeFunc("Render Queue");
+
+            ExternalDirectxOverlay.CopyToSharedTexture(device);
         }
 
         protected override void Load() { /* NOOP */ }

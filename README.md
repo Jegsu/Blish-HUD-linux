@@ -1,6 +1,17 @@
 ﻿# Blish HUD
 [![Discord](https://img.shields.io/discord/531175899588984842.svg?logo=discord&logoColor=%237289DA)](https://discord.gg/FYKN3qh)
 
+> **This is a Linux-focused fork.** It renders Blish HUD inside Guild Wars 2 rather than as a
+> window on top of it, so it works under Wine and Proton, including in fullscreen. The part that
+> runs inside the game lives in [`bridge/`](bridge/); see its [README](bridge/README.md) for installing.
+>
+> This builds on [SorryQuick](https://github.com/SorryQuick)'s work, which made Blish HUD run
+> this way in the first place: [external-dx11-overlay](https://github.com/SorryQuick/external-dx11-overlay)
+> and his [Blish HUD fork](https://github.com/SorryQuick/Blish-HUD). The bridge here is a
+> rewrite of the former; see the [bridge README](bridge/README.md#credits).
+>
+> Everything below is upstream Blish HUD's own README.
+
 **Visit our site:** https://blishhud.com
 
 ## Check our Setup Guide

@@ -1,0 +1,15 @@
+<Project>
+  <!--
+    Imported after each project body, so it can drop items the project declared.
+
+    With -p:SkipContentBuild=true the MonoGame content pipeline is not run. This exists for
+    Linux/container builds: the .spritefont assets request the "Consolas" system font, which
+    MonoGame locates by scanning for a font file of that exact family name, and that font is
+    not redistributable outside Windows. Skipping affects only Content/bin (the compiled
+    assemblies are identical), so the output is meant to be dropped into an install that
+    already has its content built.
+  -->
+  <ItemGroup Condition="'$(SkipContentBuild)' == 'true'">
+    <MonoGameContentReference Remove="@(MonoGameContentReference)" />
+  </ItemGroup>
+</Project>

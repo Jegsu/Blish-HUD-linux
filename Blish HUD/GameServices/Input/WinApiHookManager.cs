@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
 
@@ -72,7 +73,22 @@ namespace Blish_HUD.Input {
                 }
             };
 
-            if (mouseHookManager.EnableHook() && keyboardHookManager.EnableHook()) inputSuccessful = true;
+            // The mouse is no longer hooked. Movement, buttons and the wheel arrive over UDP
+            // from the overlay dll instead (see ExternalDirectxOverlay.UdpListenLoop). The old
+            // global WH_MOUSE_LL hook sat in the path of every cursor warp the game performs
+            // while the right mouse button is held for camera look, and under wine that
+            // latency desynced the game's pointer tracking badly enough to strand the cursor
+            // in a corner of the screen.
+            //
+            // The keyboard still needs its hook: key events are not forwarded over UDP.
+            bool hookMouse = Environment.GetEnvironmentVariable("BLISHHUD_LEGACY_MOUSE_HOOK") == "1";
+
+            if (hookMouse) {
+                Logger.Warn("BLISHHUD_LEGACY_MOUSE_HOOK=1 - installing the global mouse hook. This is the pre-UDP input path and is known to corrupt the cursor during camera look.");
+                if (!mouseHookManager.EnableHook()) Logger.Warn("Failed to enable the legacy mouse hook.");
+            }
+
+            if (keyboardHookManager.EnableHook()) inputSuccessful = true;
             inputHookEvent.Set();
 
             timer.Start();

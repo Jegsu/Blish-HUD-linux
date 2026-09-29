@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -55,11 +56,11 @@ namespace Blish_HUD {
 
             this.IsMouseVisible = true;
         }
-        
+
         protected override void Initialize() {
             FormHandle = this.Window.Handle;
             Form       = Control.FromHandle(FormHandle).FindForm();
-
+            ExternalDirectxOverlay.setupNewWndProc();
 
             Form.BackColor = System.Drawing.Color.Black;
             // Avoid the flash the window shows when the application launches (-32000x-32000 is where windows places minimized windows)
@@ -79,6 +80,9 @@ namespace Blish_HUD {
             }
 
             base.Initialize();
+
+            ExternalDirectxOverlay.StartUdpServer();
+
         }
 
         protected override void LoadContent() {

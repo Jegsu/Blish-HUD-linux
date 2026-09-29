@@ -1,0 +1,10 @@
+<Project>
+  <!--
+    Supplies the .NET Framework 4.7.2 reference assemblies via NuGet so the solution can be
+    built on Linux/containers, where no Windows targeting pack is installed. Has no effect on
+    a normal Windows build, which resolves the targeting pack locally instead.
+  -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

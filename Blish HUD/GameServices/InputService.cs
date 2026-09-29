@@ -65,6 +65,11 @@ namespace Blish_HUD {
         }
 
         protected override void Update(GameTime gameTime) {
+            // Mouse input arrives from the overlay dll on a socket thread and is only queued
+            // there; it is applied here so it lands on the update thread, ahead of the handlers
+            // consuming it below.
+            ExternalDirectxOverlay.DrainMouseEvents();
+
             Mouse.Update();
             Keyboard.Update();
         }

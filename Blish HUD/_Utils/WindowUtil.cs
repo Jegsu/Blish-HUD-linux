@@ -175,6 +175,17 @@ namespace Blish_HUD {
                 return (OverlayUpdateResponse.Errored, screenPoint.X == MINIMIZED_POS, errorCode);
             }
 
+            // =================================== Force width from dll since it's more accurate ================================
+
+            int currentWidth = clientRect.Right - clientRect.Left;
+            int currentHeight = clientRect.Bottom - clientRect.Top;
+            int forcedWidth = ExternalDirectxOverlay.Width > 0 ? ExternalDirectxOverlay.Width : currentWidth;
+            int forcedHeight = ExternalDirectxOverlay.Height > 0 ? ExternalDirectxOverlay.Height : currentHeight;
+            clientRect.Right = clientRect.Left + forcedWidth;
+            clientRect.Bottom = clientRect.Top + forcedHeight;
+
+            // ==================================================================================================================
+
             GameService.Debug.StartTimeFunc("GetForegroundWindow");
             var activeWindowHandle = GetForegroundWindow();
             GameService.Debug.StopTimeFunc("GetForegroundWindow");
@@ -195,6 +206,15 @@ namespace Blish_HUD {
 
             if (!wasOnTop) {
                 Logger.Debug("GW2 is now the active window - reactivating the overlay.");
+            }
+
+            // While the game is minimizing/restoring it can still be the foreground window while
+            // GetClientRect already reports a zero-sized rect. Propagating that would set
+            // Resolution to (0,0) -> ApplyChanges() on a 0x0 backbuffer and a UIScaleMultiplier
+            // of 0, which poisons mouse coordinate math in MouseHandler (the divide-by-zero
+            // casts to Int32.MinValue). Keep the last known-good geometry instead.
+            if (forcedWidth <= 0 || forcedHeight <= 0) {
+                return (OverlayUpdateResponse.WithFocus, screenPoint.X == MINIMIZED_POS, 0);
             }
 
             if (clientRect.Left + screenPoint.X != pos.X || clientRect.Top + screenPoint.Y != pos.Y || clientRect.Right - clientRect.Left != pos.Width || clientRect.Bottom - clientRect.Top != pos.Height || wasOnTop == false) {
